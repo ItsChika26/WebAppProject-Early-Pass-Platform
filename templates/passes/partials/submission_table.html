@@ -1,0 +1,10 @@
+<table class="table table-striped table-hover ep-table mb-0">
+  <thead><tr><th>Class</th><th>Student</th><th>Status</th><th>File</th><th>Actions</th></tr></thead>
+  <tbody id="submission-rows">
+    {% for obj in submissions %}
+      {% include "passes/partials/submission_row.html" with obj=obj %}
+    {% empty %}
+      <tr><td colspan="5" class="ep-empty text-center py-3">No submissions.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>

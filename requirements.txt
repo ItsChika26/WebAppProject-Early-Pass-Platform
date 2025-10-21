@@ -1,0 +1,7 @@
+Django==5.2.7
+django-allauth
+django-filter
+django-htmx
+django-seed
+gunicorn
+whitenoise

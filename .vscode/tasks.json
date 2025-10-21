@@ -1,0 +1,35 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Django migrations and tests",
+			"type": "shell",
+			"command": "python -m pip show django >NUL 2>&1 || python -m pip install django==4.2.20 django-allauth django-filter django-htmx django-seed pytest pytest-django ; python manage.py migrate ; pytest -q",
+			"isBackground": false,
+			"problemMatcher": [
+				"$eslint - stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Install deps, migrate, test (Powershell)",
+			"type": "shell",
+			"command": "if (-not (python -m pip show django)) { python -m pip install django==4.2.20 django-allauth django-filter django-htmx django-seed pytest pytest-django } ; python manage.py migrate ; pytest -q",
+			"isBackground": false,
+			"problemMatcher": [
+				"$eslint - stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Run tests (Powershell)",
+			"type": "shell",
+			"command": "pytest -q",
+			"isBackground": false,
+			"problemMatcher": [
+				"$eslint - stylish"
+			],
+			"group": "build"
+		}
+	]
+}

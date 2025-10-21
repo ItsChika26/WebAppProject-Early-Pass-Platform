@@ -1,0 +1,8 @@
+<table class="table table-striped bg-white shadow-sm">
+  <thead><tr><th>Event</th><th>Status</th><th>Reason</th><th>Actions</th></tr></thead>
+  <tbody>
+  {% for obj in filter.qs %}
+    {% include "passes/partials/submission_row.html" with obj=obj %}
+  {% empty %}<tr><td colspan="4" class="text-muted">No passes</td></tr>{% endfor %}
+  </tbody>
+</table>

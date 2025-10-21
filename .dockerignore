@@ -1,0 +1,16 @@
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.sqlite
+.env
+.git
+.gitignore
+.idea
+.vscode
+htmlcov
+.coverage*
+.DS_Store
+node_modules

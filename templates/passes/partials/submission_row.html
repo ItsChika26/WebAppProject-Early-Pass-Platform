@@ -1,0 +1,33 @@
+<tr id="row-{{ obj.id }}">
+    <td>{{ obj.class_ref.name }}</td>
+    <td>{{ obj.student.username }}</td>
+    <td>
+        {% if obj.status == "P" %}<span class="badge bg-warning text-dark">Pending</span>
+        {% elif obj.status == "A" %}<span class="badge bg-success">Approved</span>
+        {% else %}<span class="badge bg-danger">Rejected</span>{% endif %}
+    </td>
+    <td>
+        {% if obj.file %}
+            <a href="{{ obj.file.url }}" target="_blank">Download</a>
+        {% else %}
+            <span class="text-muted">—</span>
+        {% endif %}
+    </td>
+    <td>
+        {% if request.user.is_staff or request.user.id == obj.class_ref.teacher_id %}
+            {% if obj.status == "P" %}
+                <button class="btn btn-sm btn-outline-success"
+                        hx-post="/submissions/{{ obj.id }}/approve/"
+                        hx-target="#row-{{ obj.id }}" hx-swap="outerHTML">
+                    Approve
+                </button>
+                <button class="btn btn-sm btn-outline-danger"
+                        hx-post="/submissions/{{ obj.id }}/reject/"
+                        hx-target="#row-{{ obj.id }}" hx-swap="outerHTML">
+                    Reject
+                </button>
+
+            {% endif %}
+        {% endif %}
+    </td>
+</tr>

@@ -1,0 +1,347 @@
+:root {
+  /* Color Palette - Modern Professional */
+  --ep-primary: #4f46e5;        /* Indigo - primary actions */
+  --ep-primary-hover: #4338ca;  /* Darker indigo for hover */
+  --ep-primary-light: #eef2ff;  /* Light indigo background */
+  
+  --ep-secondary: #06b6d4;      /* Cyan - secondary actions */
+  --ep-secondary-hover: #0891b2;
+  --ep-secondary-light: #ecfeff;
+  
+  --ep-success: #10b981;        /* Green - success states */
+  --ep-success-light: #d1fae5;
+  
+  --ep-danger: #ef4444;         /* Red - errors/warnings */
+  --ep-danger-light: #fee2e2;
+  
+  --ep-warning: #f59e0b;        /* Amber - warnings */
+  --ep-warning-light: #fef3c7;
+  
+  --ep-bg: #f8fafc;             /* Light gray background */
+  --ep-card-bg: #ffffff;        /* White cards */
+  --ep-border: #e2e8f0;         /* Subtle borders */
+  
+  --ep-text-primary: #1e293b;   /* Dark slate text */
+  --ep-text-secondary: #64748b; /* Gray text */
+  --ep-text-muted: #94a3b8;     /* Lighter gray */
+  
+  --ep-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --ep-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --ep-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+body {
+  background: var(--ep-bg);
+  color: var(--ep-text-primary);
+}
+
+.ep-card {
+  background: var(--ep-card-bg);
+  border-radius: .75rem;
+  border: 1px solid var(--ep-border);
+  box-shadow: var(--ep-shadow);
+  transition: box-shadow 0.2s ease;
+}
+
+.ep-card:hover {
+  box-shadow: var(--ep-shadow-lg);
+}
+
+.ep-section-title {
+  font-weight: 600;
+  color: var(--ep-text-primary);
+}
+
+.table.ep-table {
+  --bs-table-bg: transparent;
+}
+
+.ep-empty {
+  color: var(--ep-text-muted);
+  font-style: italic;
+}
+
+.navbar {
+  background: var(--ep-primary) !important;
+  box-shadow: var(--ep-shadow);
+}
+
+.navbar .navbar-brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: white !important;
+}
+
+.navbar .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  transition: color 0.2s ease;
+}
+
+.navbar .nav-link:hover {
+  color: white !important;
+}
+
+.navbar .navbar-text {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.navbar .btn-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  text-decoration: none;
+}
+
+.navbar .btn-link:hover {
+  color: white !important;
+}
+
+
+.form-control, .form-select {
+  border-radius: .5rem;
+  border-color: var(--ep-border);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--ep-primary);
+  box-shadow: 0 0 0 3px var(--ep-primary-light);
+}
+
+.btn {
+  border-radius: .5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: var(--ep-primary);
+  border-color: var(--ep-primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--ep-primary-hover);
+  border-color: var(--ep-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--ep-shadow);
+}
+
+.btn-secondary {
+  background-color: var(--ep-secondary);
+  border-color: var(--ep-secondary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--ep-secondary-hover);
+  border-color: var(--ep-secondary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--ep-shadow);
+}
+
+.btn-success {
+  background-color: var(--ep-success);
+  border-color: var(--ep-success);
+}
+
+.btn-danger {
+  background-color: var(--ep-danger);
+  border-color: var(--ep-danger);
+}
+
+.btn-outline-secondary {
+  color: var(--ep-secondary);
+  border-color: var(--ep-border);
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--ep-secondary);
+  border-color: var(--ep-secondary);
+  color: white;
+}
+
+.btn-sm {
+  padding: .375rem .75rem;
+  font-size: .875rem;
+}
+
+
+/* Make validation remarks smaller and tidy */
+.errorlist {
+  margin: .25rem 0 0 1rem;
+  padding: 0;
+  font-size: .875rem; /* small */
+  color: var(--ep-danger);
+}
+.errorlist li { list-style: disc; }
+.form-text.small, .text-small { font-size: .875rem; }
+
+/* Alerts */
+.alert {
+  border-radius: .5rem;
+  border: none;
+}
+
+.alert-danger {
+  background-color: var(--ep-danger-light);
+  color: var(--ep-danger);
+}
+
+.alert-success {
+  background-color: var(--ep-success-light);
+  color: var(--ep-success);
+}
+
+.alert-warning {
+  background-color: var(--ep-warning-light);
+  color: var(--ep-warning);
+}
+
+.alert-info {
+  background-color: var(--ep-secondary-light);
+  color: var(--ep-secondary);
+}
+
+/* Badges */
+.badge {
+  font-weight: 500;
+  padding: .35rem .65rem;
+  border-radius: .375rem;
+}
+
+.badge.bg-success {
+  background-color: var(--ep-success) !important;
+}
+
+.badge.bg-warning {
+  background-color: var(--ep-warning) !important;
+}
+
+.badge.bg-danger {
+  background-color: var(--ep-danger) !important;
+}
+
+.badge.bg-secondary {
+  background-color: var(--ep-text-secondary) !important;
+}
+
+/* Tables */
+.table {
+  color: var(--ep-text-primary);
+}
+
+.table thead th {
+  background-color: var(--ep-primary-light);
+  color: var(--ep-primary);
+  font-weight: 600;
+  border-bottom: 2px solid var(--ep-primary);
+}
+
+.table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.table tbody tr:hover {
+  background-color: var(--ep-primary-light);
+}
+
+.table td, .table th {
+  border-color: var(--ep-border);
+}
+
+/* Links */
+a {
+  color: var(--ep-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--ep-primary-hover);
+  text-decoration: underline;
+}
+
+/* Text colors */
+.text-muted {
+  color: var(--ep-text-muted) !important;
+}
+
+.text-danger {
+  color: var(--ep-danger) !important;
+}
+
+.text-success {
+  color: var(--ep-success) !important;
+}
+
+
+/* Inputs inside ep-card look consistent even when not given classes */
+.ep-card input[type="text"],
+.ep-card input[type="password"],
+.ep-card input[type="email"],
+.ep-card input[type="number"],
+.ep-card select,
+.ep-card textarea {
+  width: 100%;
+  padding: .5rem .75rem;
+  border: 1px solid var(--ep-border);
+  border-radius: .5rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ep-card input[type="text"]:focus,
+.ep-card input[type="password"]:focus,
+.ep-card input[type="email"]:focus,
+.ep-card input[type="number"]:focus,
+.ep-card select:focus,
+.ep-card textarea:focus {
+  outline: none;
+  border-color: var(--ep-primary);
+  box-shadow: 0 0 0 3px var(--ep-primary-light);
+}
+
+/* Form labels */
+.form-label {
+  font-weight: 500;
+  color: var(--ep-text-primary);
+  margin-bottom: .5rem;
+}
+
+/* Better spacing for form elements */
+form p {
+  margin-bottom: 1rem;
+}
+
+/* File upload styling */
+input[type="file"] {
+  padding: .5rem;
+  border: 1px solid var(--ep-border);
+  border-radius: .5rem;
+  background: var(--ep-card-bg);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+input[type="file"]:hover {
+  border-color: var(--ep-primary);
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .ep-card {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    border-radius: .5rem;
+  }
+  
+  .display-4 {
+    font-size: 2rem;
+  }
+}
+
+/* Loading states */
+.htmx-request .htmx-indicator {
+  display: inline-block;
+}
+
+.htmx-indicator {
+  display: none;
+}
+

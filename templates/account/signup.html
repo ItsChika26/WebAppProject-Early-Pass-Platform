@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+<div class="container py-5" style="max-width:520px">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold mb-2">{% trans "Create your account" %}</h2>
+    <p class="text-muted">{% trans "Join EarlyPass today" %}</p>
+  </div>
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger py-2">
+      {% for err in form.non_field_errors %}
+        <div class="small">{{ err }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <form method="post" action="{% url 'account_signup' %}" class="ep-card p-4">
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div class="mb-3" data-field="{{ field.name }}">
+        <label class="form-label small" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+          <div class="form-text text-muted small">{{ field.help_text|safe }}</div>
+        {% endif %}
+        {% for err in field.errors %}
+          <div class="form-text text-danger small">{{ err }}</div>
+        {% endfor %}
+
+        {% if field.name == 'password1' %}
+          {% with p_errors=form.errors.password1 %}
+            {% with p_errs_str=p_errors|stringformat:'s' %}
+              <ul class="list-unstyled mt-2 mb-0">
+                <li class="small {% if p_errors and 'too short' in p_errs_str %}text-danger{% else %}text-muted{% endif %}">At least 8 characters</li>
+                <li class="small {% if p_errors and 'entirely numeric' in p_errs_str %}text-danger{% else %}text-muted{% endif %}">Not entirely numeric</li>
+                <li class="small {% if p_errors and 'too common' in p_errs_str %}text-danger{% else %}text-muted{% endif %}">Not a common password</li>
+                <li class="small {% if p_errors and 'too similar' in p_errs_str %}text-danger{% else %}text-muted{% endif %}">Not too similar to your personal info</li>
+              </ul>
+            {% endwith %}
+          {% endwith %}
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <button class="btn btn-primary w-100">{% trans "Create account" %}</button>
+  </form>
+  <div class="text-center mt-3">
+    <span class="text-muted">{% trans "Already have an account?" %}</span>
+    <a href="{% url 'account_login' %}" class="ms-1">{% trans "Sign in" %}</a>
+  </div>
+
+  <script>
+    (function(){
+      const isTeacher = document.querySelector('input[name="is_teacher"]');
+      const coursesWrap = document.querySelector('[data-field="teacher_courses"]');
+      const yearsWrap = document.querySelector('[data-field="teacher_years"]');
+      function toggle(){
+        const show = isTeacher && isTeacher.checked;
+        [coursesWrap, yearsWrap].forEach(function(el){ if (el) el.style.display = show ? '' : 'none'; });
+      }
+      if (isTeacher) {
+        isTeacher.addEventListener('change', toggle);
+        toggle();
+      }
+    })();
+  </script>
+</div>
+{% endblock %}

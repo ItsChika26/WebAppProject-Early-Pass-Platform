@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+<div class="container py-5" style="max-width:480px">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold mb-2">{% trans "Sign out" %}</h2>
+    <p class="text-muted">{% trans "Come back soon!" %}</p>
+  </div>
+  <div class="ep-card p-4">
+    <p class="text-center mb-4">{% trans "Are you sure you want to sign out?" %}</p>
+    <form method="post" action="{% url 'account_logout' %}">
+      {% csrf_token %}
+      <button class="btn btn-danger w-100 mb-2">{% trans "Yes, sign me out" %}</button>
+    </form>
+    <a class="btn btn-outline-secondary w-100" href="/">{% trans "Cancel" %}</a>
+  </div>
+</div>
+{% endblock %}
