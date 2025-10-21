@@ -6,7 +6,7 @@
 ![Django](https://img.shields.io/badge/django-5.2.7-green.svg)
 ![Docker](https://img.shields.io/badge/docker-ready-blue.svg)
 ![Tests](https://img.shields.io/badge/tests-passing-success.svg)
-![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen.svg)
+![Coverage](https://img.shields.io/badge/coverage-88%25-brightgreen.svg)
 
 A modern, elegant class and submission management system with role-based access control, teacher approval workflows, and a beautiful, consistent UI design.
 
