@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ class.name }} - Roster{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4" style="max-width: 1400px;">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <h1 class="mb-0" style="color: var(--ep-primary); font-weight: 600;">{{ class.name }}</h1>
+                        {% if class.is_past_deadline %}
+                            <span class="badge bg-danger fs-6">
+                                <i class="bi bi-exclamation-circle"></i> Past Deadline
+                            </span>
+                        {% else %}
+                            <span class="badge bg-success fs-6">
+                                <i class="bi bi-check-circle"></i> Open
+                            </span>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex gap-4 text-muted">
+                        <span>
+                            <i class="bi bi-mortarboard-fill"></i> 
+                            <strong>Year {{ class.year }}</strong>
+                        </span>
+                        <span>
+                            <i class="bi bi-person-fill"></i> 
+                            {{ class.teacher.get_full_name|default:class.teacher.username }}
+                        </span>
+                        <span>
+                            <i class="bi bi-calendar-event-fill"></i> 
+                            <strong>{{ class.deadline|date:"M d, Y - g:i A" }}</strong>
+                        </span>
+                    </div>
+                </div>
+                <a href="{% url 'classes:list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Classes
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Class Description -->
+    {% if class.description %}
+    <div class="row mb-4">
+        <div class="col">
+            <div class="ep-card" style="border-left: 4px solid var(--ep-info);">
+                <div class="d-flex gap-3">
+                    <div style="font-size: 2rem; color: var(--ep-info);">
+                        <i class="bi bi-info-circle-fill"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="mb-2" style="color: var(--ep-info); font-weight: 600;">
+                            Requirements to Pass
+                        </h5>
+                        <p class="mb-0 text-muted">{{ class.description }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Teacher Statistics -->
+    {% if is_teacher %}
+    <div class="row g-3 mb-4">
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="ep-card text-center h-100" style="border-top: 3px solid var(--ep-primary);">
+                <div style="font-size: 2rem; color: var(--ep-primary);">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <h2 class="mb-1 mt-2" style="font-weight: 700;">{{ total_students }}</h2>
+                <small class="text-muted text-uppercase" style="font-weight: 500; letter-spacing: 0.5px;">Total Students</small>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="ep-card text-center h-100" style="border-top: 3px solid var(--ep-success);">
+                <div style="font-size: 2rem; color: var(--ep-success);">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <h2 class="mb-1 mt-2 text-success" style="font-weight: 700;">{{ stats.approved }}</h2>
+                <small class="text-muted text-uppercase" style="font-weight: 500; letter-spacing: 0.5px;">Approved</small>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="ep-card text-center h-100" style="border-top: 3px solid var(--ep-warning);">
+                <div style="font-size: 2rem; color: var(--ep-warning);">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <h2 class="mb-1 mt-2 text-warning" style="font-weight: 700;">{{ stats.pending }}</h2>
+                <small class="text-muted text-uppercase" style="font-weight: 500; letter-spacing: 0.5px;">Pending</small>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="ep-card text-center h-100" style="border-top: 3px solid var(--ep-danger);">
+                <div style="font-size: 2rem; color: var(--ep-danger);">
+                    <i class="bi bi-x-circle-fill"></i>
+                </div>
+                <h2 class="mb-1 mt-2 text-danger" style="font-weight: 700;">{{ stats.rejected }}</h2>
+                <small class="text-muted text-uppercase" style="font-weight: 500; letter-spacing: 0.5px;">Rejected</small>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="ep-card text-center h-100" style="border-top: 3px solid var(--ep-secondary);">
+                <div style="font-size: 2rem; color: var(--ep-secondary);">
+                    <i class="bi bi-dash-circle-fill"></i>
+                </div>
+                <h2 class="mb-1 mt-2 text-secondary" style="font-weight: 700;">{{ stats.not_submitted }}</h2>
+                <small class="text-muted text-uppercase" style="font-weight: 500; letter-spacing: 0.5px;">Not Submitted</small>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="ep-card text-center h-100" style="border-top: 3px solid var(--ep-info);">
+                <div style="font-size: 2rem; color: var(--ep-info);">
+                    <i class="bi bi-file-earmark-check-fill"></i>
+                </div>
+                <h2 class="mb-1 mt-2 text-info" style="font-weight: 700;">{{ stats.submitted }}</h2>
+                <small class="text-muted text-uppercase" style="font-weight: 500; letter-spacing: 0.5px;">Total Submitted</small>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Roster Table -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="ep-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0" style="font-weight: 600;">
+                        <i class="bi bi-people"></i>
+                        {% if is_teacher %}
+                            Class Roster & Submission Status
+                        {% else %}
+                            Class Roster
+                        {% endif %}
+                    </h4>
+                    <span class="badge bg-light text-dark">{{ total_students }} student{{ total_students|pluralize }}</span>
+                </div>
+                
+                {% if roster_data %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead style="background-color: rgba(99, 102, 241, 0.05); border-bottom: 2px solid var(--ep-primary);">
+                            <tr>
+                                <th style="width: 50px; font-weight: 600;">#</th>
+                                <th style="font-weight: 600;">
+                                    <i class="bi bi-person-badge"></i> Student
+                                </th>
+                                <th style="font-weight: 600;">
+                                    <i class="bi bi-envelope"></i> Email
+                                </th>
+                                <th style="font-weight: 600;">
+                                    <i class="bi bi-calendar-check"></i> Enrolled
+                                </th>
+                                {% if is_teacher %}
+                                <th class="text-center" style="font-weight: 600;">
+                                    <i class="bi bi-clipboard-check"></i> Status
+                                </th>
+                                <th class="text-end" style="font-weight: 600;">Actions</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in roster_data %}
+                            <tr style="{% if data.student == request.user %}background-color: rgba(99, 102, 241, 0.03);{% endif %}">
+                                <td class="text-muted fw-semibold">{{ forloop.counter }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
+                                             style="width: 36px; height: 36px; font-weight: 600; color: var(--ep-primary);">
+                                            {{ data.student.username|slice:":1"|upper }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">
+                                                {{ data.student.get_full_name|default:data.student.username }}
+                                                {% if data.student == request.user %}
+                                                    <span class="badge bg-primary ms-2">You</span>
+                                                {% endif %}
+                                            </div>
+                                            <small class="text-muted">@{{ data.student.username }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-muted">
+                                    <small>{{ data.student.email|default:"—" }}</small>
+                                </td>
+                                <td class="text-muted">
+                                    <small>{{ data.enrollment.joined_at|date:"M d, Y" }}</small>
+                                </td>
+                                
+                                {% if is_teacher %}
+                                <td class="text-center">
+                                    {% if data.status_code == 'A' %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i> {{ data.status }}
+                                        </span>
+                                    {% elif data.status_code == 'R' %}
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-x-circle"></i> {{ data.status }}
+                                        </span>
+                                    {% elif data.status_code == 'P' %}
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-clock"></i> {{ data.status }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-dash-circle"></i> {{ data.status }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    {% if data.submission %}
+                                        <a href="{% url 'submissions:list' %}?class={{ class.id }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> View
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted small">—</span>
+                                    {% endif %}
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <div style="font-size: 4rem; color: var(--ep-secondary); opacity: 0.3;">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h5 class="mt-3 text-muted">No students enrolled yet</h5>
+                    <p class="text-muted small">Students will appear here once they enroll in this class.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Submission Section -->
+    {% if not is_teacher %}
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="ep-card" style="border-top: 4px solid var(--ep-primary);">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
+                         style="width: 56px; height: 56px; font-size: 1.5rem; color: var(--ep-primary);">
+                        <i class="bi bi-cloud-upload"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0" style="font-weight: 600;">Your Submission</h4>
+                        <small class="text-muted">Upload your assignment for this class</small>
+                    </div>
+                </div>
+                
+                {% if user_submission %}
+                    <!-- Existing Submission Status -->
+                    <div class="mb-4 p-4 rounded-3"
+                         style="{% if user_submission.status == 'A' %}background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%); border: 2px solid var(--ep-success);
+                                {% elif user_submission.status == 'R' %}background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%); border: 2px solid var(--ep-danger);
+                                {% else %}background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%); border: 2px solid var(--ep-warning);{% endif %}">
+                        <div class="d-flex align-items-start gap-3">
+                            <div style="font-size: 2rem;">
+                                {% if user_submission.status == 'A' %}
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                {% elif user_submission.status == 'R' %}
+                                    <i class="bi bi-x-circle-fill text-danger"></i>
+                                {% else %}
+                                    <i class="bi bi-clock-history text-warning"></i>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h5 class="mb-2 fw-semibold"
+                                    style="color: {% if user_submission.status == 'A' %}var(--ep-success){% elif user_submission.status == 'R' %}var(--ep-danger){% else %}var(--ep-warning){% endif %};">
+                                    {% if user_submission.status == 'A' %}
+                                        ✓ Submission Approved
+                                    {% elif user_submission.status == 'R' %}
+                                        ✗ Submission Rejected
+                                    {% else %}
+                                        ⏳ Pending Review
+                                    {% endif %}
+                                </h5>
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-file-earmark-fill text-muted"></i>
+                                    <a href="{{ user_submission.file.url }}" target="_blank" 
+                                       class="text-decoration-none fw-semibold"
+                                       style="color: var(--ep-primary);">
+                                        {{ user_submission.file.name|slice:"11:" }}
+                                        <i class="bi bi-box-arrow-up-right ms-1"></i>
+                                    </a>
+                                </div>
+                                {% if user_submission.feedback %}
+                                <div class="mt-3 p-3 bg-white rounded">
+                                    <strong class="text-muted small text-uppercase" style="letter-spacing: 0.5px;">Teacher Feedback:</strong>
+                                    <p class="mb-0 mt-2">{{ user_submission.feedback }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if user_submission.status == 'R' or user_submission.status == 'P' %}
+                    <div class="alert alert-info mb-4">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Tip:</strong> You can update your submission using the form below.
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <!-- No Submission Yet -->
+                    <div class="alert alert-warning mb-4 d-flex align-items-center gap-3">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <strong>No submission yet</strong>
+                            <p class="mb-0 small">You haven't submitted anything for this class. Use the form below to submit your work.</p>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <!-- Submission Form -->
+                <div class="p-4 rounded-3" style="background-color: rgba(99, 102, 241, 0.03); border: 2px dashed rgba(99, 102, 241, 0.2);">
+                    <form method="post" action="{% url 'submissions:new' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ submission_form.class_ref }}
+                        
+                        <div class="mb-4">
+                            <label for="{{ submission_form.file.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-file-earmark-arrow-up"></i> 
+                                {% if user_submission %}Replace File{% else %}Upload File{% endif %}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ submission_form.file }}
+                            {% if submission_form.file.errors %}
+                                <div class="text-danger small mt-1">
+                                    <i class="bi bi-exclamation-circle"></i> {{ submission_form.file.errors }}
+                                </div>
+                            {% else %}
+                                <small class="text-muted d-block mt-1">
+                                    Accepted formats: PDF, DOC, DOCX, TXT, ZIP, PY, IPYNB, MD
+                                </small>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ submission_form.feedback.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-chat-text"></i> Note to Teacher <span class="text-muted small">(Optional)</span>
+                            </label>
+                            {{ submission_form.feedback }}
+                            {% if submission_form.feedback.errors %}
+                                <div class="text-danger small mt-1">
+                                    <i class="bi bi-exclamation-circle"></i> {{ submission_form.feedback.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg px-4">
+                            <i class="bi bi-cloud-upload"></i> 
+                            {% if user_submission %}Update Submission{% else %}Submit Assignment{% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

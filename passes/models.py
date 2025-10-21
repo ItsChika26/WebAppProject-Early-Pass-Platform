@@ -10,6 +10,11 @@ from django.conf import settings
 User = get_user_model()
 
 
+def default_proposed_deadline():
+    """Default deadline for proposed classes - 30 days from now"""
+    return timezone.now() + timedelta(days=30)
+
+
 class Profile(models.Model):
     """
     Per-user profile to store student year (and future attributes).
@@ -30,6 +35,7 @@ class Class(models.Model):
     teacher = models.ForeignKey(User, on_delete=models.PROTECT, related_name="classes_taught")
     year = models.PositiveIntegerField(help_text="Year group, e.g., 1, 2, 3")
     deadline = models.DateTimeField()
+    description = models.TextField(blank=True, default="", help_text="Requirements to pass this class")
 
     class Meta:
         ordering = ["deadline", "name"]
@@ -93,12 +99,12 @@ class TeacherApplication(models.Model):
     def approve(self, default_deadline_days: int | None = None) -> list['Class']:
         """
         Approve this application: mark approved, add user to 'teacher' group,
-        create Class rows for each (course_name, year), and auto-enroll students
-        in the same year to these classes.
-        Returns the list of created Class instances.
+        and activate the user. Teachers will propose classes after approval.
+        Returns an empty list since no classes are created during approval.
         """
         if self.status == "A":
-            return list(Class.objects.filter(teacher=self.user, name__in=self.course_names, year__in=self.years))
+            # Already approved - return empty list (no classes created at approval time)
+            return []
 
         self.status = "A"
         self.decided_at = timezone.now()
@@ -112,45 +118,8 @@ class TeacherApplication(models.Model):
             self.user.is_active = True
             self.user.save(update_fields=["is_active"])
 
-        # Create classes (avoid duplicates thanks to unique constraint)
-        created_classes = []
-        days = (
-            default_deadline_days
-            if default_deadline_days is not None
-            else getattr(settings, "DEFAULT_CLASS_DEADLINE_DAYS", 30)
-        )
-        deadline = timezone.now() + timedelta(days=days)
-        for cname in self.course_names:
-            cname = (cname or "").strip()
-            if not cname:
-                continue
-            for y in self.years:
-                try:
-                    cls, _ = Class.objects.get_or_create(
-                        name=cname,
-                        year=int(y),
-                        teacher=self.user,
-                        defaults={"deadline": deadline},
-                    )
-                    created_classes.append(cls)
-                except Exception:
-                    # In case of race/constraint issues, skip to next
-                    continue
-
-        # Auto-enroll users by matching profile.student_year
-        # Build dict year -> classes
-        by_year = {}
-        for cls in created_classes:
-            by_year.setdefault(cls.year, []).append(cls)
-
-        for year, classes in by_year.items():
-            students = User.objects.filter(profile__student_year=year).distinct()
-            # Create enrollments idempotently
-            for student in students:
-                for cls in classes:
-                    Enrollment.objects.get_or_create(student=student, class_ref=cls)
-
-        return created_classes
+        # No classes created - teacher will use the propose class feature
+        return []
 
 
 class ProposedClass(models.Model):
@@ -166,6 +135,15 @@ class ProposedClass(models.Model):
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="proposed_classes")
     name = models.CharField(max_length=120)
     year = models.PositiveIntegerField()
+    deadline = models.DateTimeField(
+        help_text="Submission deadline for this class",
+        default=default_proposed_deadline
+    )
+    description = models.TextField(
+        blank=True,
+        default="",
+        help_text="Description of what students need to do to pass this class"
+    )
     status = models.CharField(max_length=1, choices=STATUS, default="P")
     created_at = models.DateTimeField(auto_now_add=True)
     decided_at = models.DateTimeField(null=True, blank=True)
@@ -187,19 +165,23 @@ class ProposedClass(models.Model):
             self.decided_at = timezone.now()
             self.save(update_fields=["status", "decided_at"])
 
-        # Create or fetch the class
-        days = (
-            default_deadline_days
-            if default_deadline_days is not None
-            else getattr(settings, "DEFAULT_CLASS_DEADLINE_DAYS", 30)
-        )
-        deadline = timezone.now() + timedelta(days=days)
-        cls, _ = Class.objects.get_or_create(
+        # Create or fetch the class - use the deadline and description from the proposal
+        cls, created = Class.objects.get_or_create(
             name=self.name,
             year=self.year,
             teacher=self.teacher,
-            defaults={"deadline": deadline},
+            defaults={
+                "deadline": self.deadline,
+                "description": self.description,
+            },
         )
+        
+        # If class already exists, update deadline and description from proposal
+        if not created:
+            cls.deadline = self.deadline
+            cls.description = self.description
+            cls.save(update_fields=["deadline", "description"])
+        
         # Auto-enroll matching year students
         students = User.objects.filter(profile__student_year=self.year)
         for s in students:

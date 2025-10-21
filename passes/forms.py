@@ -6,7 +6,9 @@ class SubmissionForm(forms.ModelForm):
         model = Submission
         fields = ["class_ref", "file", "feedback"]
         widgets = {
-            "feedback": forms.Textarea(attrs={"rows": 3, "placeholder": "Optional note to teacher"})
+            "class_ref": forms.Select(attrs={"class": "form-select"}),
+            "file": forms.FileInput(attrs={"class": "form-control"}),
+            "feedback": forms.Textarea(attrs={"rows": 3, "class": "form-control", "placeholder": "Optional note to teacher"})
         }
 
     def __init__(self, *args, **kwargs):
@@ -28,7 +30,24 @@ class SubmissionForm(forms.ModelForm):
 class ProposedClassForm(forms.ModelForm):
     class Meta:
         model = ProposedClass
-        fields = ["name", "year"]
+        fields = ["name", "year", "deadline", "description"]
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "e.g., Introduction to Python"}),
+            "year": forms.NumberInput(attrs={"class": "form-control", "min": 1, "max": 12}),
+            "deadline": forms.DateTimeInput(
+                attrs={
+                    "type": "datetime-local",
+                    "class": "form-control"
+                }
+            ),
+            "description": forms.Textarea(
+                attrs={
+                    "rows": 4,
+                    "class": "form-control",
+                    "placeholder": "Describe what students need to do to pass this class (e.g., assignments, projects, exams)"
+                }
+            )
+        }
 
     def clean_name(self):
         name = (self.cleaned_data.get("name") or "").strip()
@@ -43,3 +62,10 @@ class ProposedClassForm(forms.ModelForm):
         if not (1 <= int(year) <= 12):
             raise forms.ValidationError("Year must be between 1 and 12.")
         return year
+    
+    def clean_deadline(self):
+        from django.utils import timezone
+        deadline = self.cleaned_data.get("deadline")
+        if deadline and deadline <= timezone.now():
+            raise forms.ValidationError("Deadline must be in the future.")
+        return deadline

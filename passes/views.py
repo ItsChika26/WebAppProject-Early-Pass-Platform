@@ -1,4 +1,5 @@
 # passes/views.py
+from django import forms
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseForbidden
@@ -96,12 +97,17 @@ def submission_list(request):
             "selected_status": status,
             "selected_class": class_id,
             "q": q,
+            "is_teacher": is_teacher,
         },
     )
 
 
 @login_required
 def submission_create(request):
+    # Prevent teachers from submitting - only students can submit
+    if request.user.groups.filter(name="teacher").exists():
+        return HttpResponseForbidden("Teachers cannot submit assignments. Only students can submit.")
+    
     if request.method == "POST":
         form = SubmissionForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
@@ -123,6 +129,9 @@ def submission_create(request):
 
             if request.htmx:
                 return render(request, "passes/partials/submit_success.html", {"sub": sub})
+            # If coming from roster page, redirect back there
+            if 'from_roster' in request.POST or request.META.get('HTTP_REFERER', '').endswith(f'/classes/{class_ref.id}/roster/'):
+                return redirect('classes:roster', class_id=class_ref.id)
             return redirect("submissions:list")
 
         # invalid form
@@ -189,4 +198,91 @@ def my_proposals(request):
         return HttpResponseForbidden()
     qs = request.user.proposed_classes.all().order_by("-created_at")
     return render(request, "passes/my_proposals.html", {"proposals": qs})
+
+
+@login_required
+def class_roster(request, class_id):
+    """
+    Show the list of students enrolled in a class.
+    Teachers can see submission status for each student.
+    Students can see their classmates and submit assignments.
+    """
+    cls = get_object_or_404(Class, id=class_id)
+    user = request.user
+    
+    # Check permissions: must be the teacher, enrolled student, or staff
+    is_teacher = cls.teacher == user or user.is_staff
+    is_enrolled = Enrollment.objects.filter(student=user, class_ref=cls).exists()
+    
+    if not (is_teacher or is_enrolled):
+        return HttpResponseForbidden("You don't have access to this class roster.")
+    
+    # Get all enrollments with related student data
+    enrollments = cls.enrollments.select_related('student').order_by('student__username')
+    
+    # For teachers, annotate each enrollment with submission status
+    roster_data = []
+    for enrollment in enrollments:
+        student_data = {
+            'enrollment': enrollment,
+            'student': enrollment.student,
+        }
+        
+        if is_teacher:
+            # Check if student has submitted
+            try:
+                submission = Submission.objects.get(
+                    student=enrollment.student,
+                    class_ref=cls
+                )
+                student_data['submission'] = submission
+                student_data['status'] = submission.get_status_display()
+                student_data['status_code'] = submission.status
+            except Submission.DoesNotExist:
+                student_data['submission'] = None
+                student_data['status'] = 'Not Submitted'
+                student_data['status_code'] = 'N'
+        
+        roster_data.append(student_data)
+    
+    context = {
+        'class': cls,
+        'roster_data': roster_data,
+        'is_teacher': is_teacher,
+        'total_students': len(roster_data),
+    }
+    
+    if is_teacher:
+        # Calculate statistics for teacher view
+        submitted = sum(1 for d in roster_data if d.get('submission'))
+        approved = sum(1 for d in roster_data if d.get('status_code') == 'A')
+        rejected = sum(1 for d in roster_data if d.get('status_code') == 'R')
+        pending = sum(1 for d in roster_data if d.get('status_code') == 'P')
+        not_submitted = sum(1 for d in roster_data if d.get('status_code') == 'N')
+        
+        context.update({
+            'stats': {
+                'submitted': submitted,
+                'approved': approved,
+                'rejected': rejected,
+                'pending': pending,
+                'not_submitted': not_submitted,
+            }
+        })
+    else:
+        # For students: check their submission status and provide a form
+        try:
+            user_submission = Submission.objects.get(student=user, class_ref=cls)
+            context['user_submission'] = user_submission
+        except Submission.DoesNotExist:
+            context['user_submission'] = None
+        
+        # Create a submission form pre-filled with the current class
+        form = SubmissionForm(user=user, initial={'class_ref': cls})
+        # Make class_ref hidden since we're already on this class page
+        form.fields['class_ref'].widget = forms.HiddenInput()
+        context['submission_form'] = form
+    
+    return render(request, "passes/class_roster.html", context)
+
 

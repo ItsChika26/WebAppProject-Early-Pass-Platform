@@ -92,24 +92,24 @@ def test_teacher_approves_htmx(client, users, course, enrolled_student):
 
 
 @pytest.mark.django_db
-def test_teacher_application_approval_creates_classes_and_enrolls():
-    # Create a student with profile year 2
-    student = User.objects.create_user("sally", password="pass")
-    Profile.objects.create(user=student, student_year=2)
-    # Prospective teacher
-    teacher = User.objects.create_user("tom", password="pass")
+def test_teacher_application_approval_activates_user():
+    # Create a teacher
+    teacher = User.objects.create_user("tom", password="pass", is_active=False)
     app = TeacherApplication.objects.create(
         user=teacher,
         is_teacher=True,
-        course_names=["Intro to DB", "Algorithms I"],
-        years=[2],
+        course_names=[],  # No courses/years during signup
+        years=[],
         status="P",
     )
     created = app.approve()
-    assert len(created) == 2
-    # Ensure enrollments for student in year 2 exist for each class
-    for cls in created:
-        assert Enrollment.objects.filter(student=student, class_ref=cls).exists()
+    # No classes created at approval time
+    assert len(created) == 0
+    # But teacher should be activated and in teacher group
+    teacher.refresh_from_db()
+    assert teacher.is_active
+    assert teacher.groups.filter(name="teacher").exists()
+    assert app.status == "A"
 
 
 @pytest.mark.django_db
@@ -119,8 +119,8 @@ def test_email_sent_on_teacher_application_creation(settings):
     TeacherApplication.objects.create(
         user=teacher,
         is_teacher=True,
-        course_names=["Operating Systems"],
-        years=[3],
+        course_names=[],
+        years=[],
         status="P",
     )
     # Using console backend, the email will appear in mail.outbox
@@ -130,12 +130,25 @@ def test_email_sent_on_teacher_application_creation(settings):
 
 @pytest.mark.django_db
 def test_proposed_class_approval_creates_class_and_enrolls():
+    from django.utils import timezone
+    from datetime import timedelta
+    
     teacher = User.objects.create_user("teachx", password="pass")
     student = User.objects.create_user("studx", password="pass")
     Profile.objects.create(user=student, student_year=2)
 
-    pc = ProposedClass.objects.create(teacher=teacher, name="Data Structures", year=2, status="P")
+    custom_deadline = timezone.now() + timedelta(days=45)
+    pc = ProposedClass.objects.create(
+        teacher=teacher, 
+        name="Data Structures", 
+        year=2, 
+        status="P",
+        deadline=custom_deadline,
+        description="Complete all assignments and pass the final exam."
+    )
     cls = pc.approve()
 
     assert Class.objects.filter(id=cls.id, name="Data Structures", year=2, teacher=teacher).exists()
+    assert cls.deadline == custom_deadline
+    assert cls.description == "Complete all assignments and pass the final exam."
     assert Enrollment.objects.filter(student=student, class_ref=cls).exists()

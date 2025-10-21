@@ -41,22 +41,22 @@ A modern, elegant class and submission management system with role-based access 
 - **Account Activation**: Teachers are inactive until admin approval
 
 ### 👨‍🏫 Teacher Application & Approval
-- Teachers submit applications during signup with their courses and years
+- Teachers apply during signup by checking "I am a teacher" (no course/year details required)
 - Applications enter a **Pending** state and teachers are deactivated
 - Admins receive email notifications for new applications
 - Admin approval via Django admin interface:
   - Teacher is activated and added to the `teacher` group
-  - Classes are automatically created for each (course, year) combination
-  - Students with matching years are **auto-enrolled** into these classes
-- Idempotent approval process prevents duplicate classes/enrollments
+  - Teacher can then log in and propose classes
+- Simplified approval process focuses on identity verification
 
 ### 📚 Class Proposal System
-- Approved teachers can propose additional classes after registration
+- **All teachers** use the proposal system to create classes (including newly approved teachers)
 - Proposal workflow:
-  - Teachers visit `/classes/propose/` to submit proposals
+  - Teachers visit `/classes/propose/` to submit proposals with class name and year
   - Admins review and approve via Django admin
-  - On approval, classes are created and students are auto-enrolled
+  - On approval, classes are created and students are auto-enrolled based on their year
 - Validation ensures class names and year ranges are proper
+- This is now the **only way** for teachers to create classes
 
 ### 🎓 Student Experience
 - Students specify their year during signup
@@ -64,12 +64,17 @@ A modern, elegant class and submission management system with role-based access 
 - Filter classes by year and search by name/course
 - Submit work to assigned classes with file uploads
 - View submission status (Pending/Approved/Rejected)
+- **View Class Roster**: See all classmates enrolled in each class
 
 ### 📊 Class & Submission Management
 - **Class Lists**: Role-aware display
   - Staff: See all classes
   - Teachers: See classes they teach
   - Students: See classes they're enrolled in
+- **Class Roster**: View enrolled students for each class
+  - Teachers see submission status for each student (Approved/Pending/Rejected/Not Submitted)
+  - Teachers get statistics dashboard (total students, approved, pending, rejected, not submitted)
+  - Students can view their classmates
 - **Filters**: Year, course, status with HTMX-powered live filtering
 - **File Submissions**: Upload and manage assignment files
 - **Deadline Enforcement**: Submissions rejected after class deadlines
@@ -215,17 +220,19 @@ A modern, elegant class and submission management system with role-based access 
 5. **Track Status** → View submission approval status
 
 ### Teacher Workflow
-1. **Signup** → Select teacher role, provide courses and years
+1. **Signup** → Check "I am a teacher" box (no course details required)
 2. **Wait for Approval** → Account inactive until admin approves
 3. **Login** → Access teaching dashboard after approval
-4. **View Classes** → See all classes you teach
-5. **Propose New Classes** → Submit proposals via `/classes/propose/`
-6. **Review Submissions** → Approve/reject student work with feedback
+4. **Propose Classes** → Submit class proposals via `/classes/propose/` with name and year
+5. **Wait for Class Approval** → Admin reviews and approves proposed classes
+6. **View Classes** → See all approved classes you teach
+7. **View Roster** → See enrolled students and their submission status
+8. **Review Submissions** → Approve/reject student work with feedback
 
 ### Admin Workflow
 1. **Review Applications** → `/admin` → Teacher applications
-2. **Approve Teachers** → Activate users, create classes, auto-enroll students
-3. **Approve Proposals** → `/admin` → Proposed classes
+2. **Approve Teachers** → Activate users and add to teacher group (no classes created yet)
+3. **Approve Proposals** → `/admin` → Proposed classes (creates classes and auto-enrolls students)
 4. **Manage Users** → Assign roles, edit profiles
 5. **Monitor System** → View all classes, submissions, enrollments
 

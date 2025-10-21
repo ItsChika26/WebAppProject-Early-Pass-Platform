@@ -31,23 +31,25 @@ class TeacherApplicationAdmin(admin.ModelAdmin):
     list_display = ("user", "is_teacher", "status", "created_at", "decided_at")
     list_filter = ("status", "is_teacher")
     search_fields = ("user__username", "user__email")
-    readonly_fields = ("created_at", "decided_at")
+    readonly_fields = ("created_at", "decided_at", "course_names", "years")
 
     actions = ["approve_applications", "reject_applications"]
 
     def approve_applications(self, request, queryset):
         count_apps = 0
-        count_classes = 0
         for app in queryset.filter(status="P"):
-            created = app.approve()
+            app.approve()
             count_apps += 1
-            count_classes += len(created)
         # For already approved ones, ensure activation too via signal
         for app in queryset.filter(status="A"):
             app.save(update_fields=["status"])  # trigger post_save to enforce activation
-        self.message_user(request, _(f"Approved {count_apps} applications; created {count_classes} classes."), level=messages.SUCCESS)
+        self.message_user(
+            request, 
+            _(f"Approved {count_apps} applications. Teachers can now log in and propose classes."), 
+            level=messages.SUCCESS
+        )
 
-    approve_applications.short_description = _("Approve selected applications and create classes")
+    approve_applications.short_description = _("Approve selected teacher applications")
 
     def reject_applications(self, request, queryset):
         updated = queryset.filter(status="P").update(status="R")
@@ -65,9 +67,10 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(ProposedClass)
 class ProposedClassAdmin(admin.ModelAdmin):
-    list_display = ("name", "teacher", "year", "status", "created_at")
+    list_display = ("name", "teacher", "year", "deadline", "status", "created_at")
     list_filter = ("status", "year")
-    search_fields = ("name", "teacher__username")
+    search_fields = ("name", "teacher__username", "description")
+    readonly_fields = ("created_at", "decided_at")
     actions = ["approve_proposals", "reject_proposals"]
 
     def approve_proposals(self, request, queryset):

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Account Pending Approval{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="ep-card text-center p-5">
+                <!-- Icon -->
+                <div class="mb-4">
+                    <div class="rounded-circle bg-warning bg-opacity-10 d-inline-flex align-items-center justify-content-center"
+                         style="width: 120px; height: 120px;">
+                        <i class="bi bi-hourglass-split" style="font-size: 4rem; color: var(--ep-warning);"></i>
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <h2 class="mb-3" style="font-weight: 700; color: var(--ep-primary);">
+                    Account Pending Approval
+                </h2>
+
+                <!-- Message -->
+                <p class="lead text-muted mb-4">
+                    Your teacher application is currently under review by our administrators.
+                </p>
+
+                <!-- Details Box -->
+                <div class="p-4 rounded-3 mb-4" style="background-color: rgba(245, 158, 11, 0.05); border: 2px solid rgba(245, 158, 11, 0.2);">
+                    <div class="d-flex align-items-start gap-3 text-start">
+                        <i class="bi bi-info-circle-fill text-warning" style="font-size: 1.5rem; flex-shrink: 0;"></i>
+                        <div>
+                            <h6 class="fw-semibold mb-2">What's Next?</h6>
+                            <ul class="mb-0 ps-3">
+                                <li class="mb-2">An administrator will review your application</li>
+                                <li class="mb-2">You'll receive an email notification once approved</li>
+                                <li class="mb-2">After approval, you can log in and propose classes</li>
+                                <li>Contact support if you have questions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="text-start mb-4">
+                    <h6 class="fw-semibold mb-3 text-center">Application Process</h6>
+                    <div class="d-flex flex-column gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-success d-flex align-items-center justify-content-center"
+                                 style="width: 32px; height: 32px; flex-shrink: 0;">
+                                <i class="bi bi-check-lg text-white"></i>
+                            </div>
+                            <div>
+                                <strong>Registration Submitted</strong>
+                                <small class="d-block text-muted">Your application has been received</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-warning d-flex align-items-center justify-content-center"
+                                 style="width: 32px; height: 32px; flex-shrink: 0;">
+                                <i class="bi bi-clock text-white"></i>
+                            </div>
+                            <div>
+                                <strong>Under Review</strong>
+                                <small class="d-block text-muted">Waiting for administrator approval</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-secondary bg-opacity-25 d-flex align-items-center justify-content-center"
+                                 style="width: 32px; height: 32px; flex-shrink: 0;">
+                                <i class="bi bi-arrow-right text-secondary"></i>
+                            </div>
+                            <div class="text-muted">
+                                <strong>Account Activation</strong>
+                                <small class="d-block">Full access to propose and manage classes</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="{% url 'account_logout' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-box-arrow-right"></i> Sign Out
+                    </a>
+                    <a href="mailto:{{ CONTACT_EMAIL|default:'admin@example.com' }}" class="btn btn-primary">
+                        <i class="bi bi-envelope"></i> Contact Support
+                    </a>
+                </div>
+
+                <!-- Help Text -->
+                <div class="mt-4 pt-4 border-top">
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-question-circle"></i> 
+                        Need immediate assistance? Contact us at 
+                        <a href="mailto:{{ CONTACT_EMAIL|default:'admin@example.com' }}" class="text-decoration-none">
+                            {{ CONTACT_EMAIL|default:'admin@example.com' }}
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
