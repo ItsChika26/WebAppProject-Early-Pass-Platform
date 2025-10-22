@@ -860,7 +860,7 @@ python_functions = test_*
 ## 📊 Application Overview
 
 ### **Concept:**
-EarlyPass is a modern class management and submission platform that connects students, teachers, and administrators. Teachers propose classes which must be approved by admins. Students are automatically enrolled based on their year, can submit assignments, and receive feedback. Teachers review submissions and track student progress.
+EarlyPass is a modern class management and submission platform that connects students, teachers, and administrators, where students can submit their assignments required to early pass a class. Teachers propose classes which must be approved by admins. Students are automatically enrolled based on their year, can submit assignments, and receive feedback. Teachers review submissions and track student progress.
 
 ### **Data Flow:**
 
@@ -943,11 +943,21 @@ Enroll in Class → View Requirements → Submit File → Teacher Reviews → Ap
 
 ---
 
-**Project Grade Estimate: A / Excellent**
 
-The application exceeds requirements in:
-- Test coverage (88% vs 70% required)
-- Modern tech stack (HTMX, Docker, Bootstrap 5)
-- Professional UI/UX design
-- Comprehensive role-based permissions
-- Production-ready deployment setup
+### Teacher Workflow
+1. **Signup** → Check "I am a teacher" box (no course details required)
+2. **Wait for Approval** → Account inactive until admin approves
+3. **Login** → Access teaching dashboard after approval
+4. **Propose Classes** → Submit class proposals via `/classes/propose/` with name and year
+5. **Wait for Class Approval** → Admin reviews and approves proposed classes
+6. **View Classes** → See all approved classes you teach
+7. **View Roster** → See enrolled students and their submission status
+8. **Review Submissions** → Approve/reject student work with feedback
+
+### Admin Workflow
+1. **Review Applications** → `/admin` → Teacher applications
+2. **Approve Teachers** → Activate users and add to teacher group (no classes created yet)
+3. **Approve Proposals** → `/admin` → Proposed classes (creates classes and auto-enrolls students)
+4. **Manage Users** → Assign roles, edit profiles
+5. **Monitor System** → View all classes, submissions, enrollments
+
