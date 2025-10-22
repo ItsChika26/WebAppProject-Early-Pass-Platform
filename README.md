@@ -14,23 +14,6 @@ EarlyPass is a modern class management and submission platform that connects stu
 
 ---
 
-## 📋 Table of Contents
-
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Getting Started](#-getting-started)
-  - [Local Development](#local-development)
-  - [Docker Deployment](#docker-deployment)
-- [User Workflows](#-user-workflows)
-- [Design System](#-design-system)
-- [Testing](#-testing)
-- [Management Commands](#-management-commands)
-- [Project Structure](#-project-structure)
-- [Configuration](#-configuration)
-- [Documentation](#-documentation)
-
----
-
 ## ✨ Features
 
 - **Role-Based Access**: Students, Teachers, and Admin with distinct permissions
